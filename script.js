@@ -2,9 +2,10 @@ const musicInput = document.getElementById("music-input");
 const songName = document.getElementById("song-name");
 const songTime = document.getElementById("song-time");
 const gameContainer = document.getElementById("game-container");
+const scoreText = document.querySelector("#score span");
 
+let score = 0;
 let audio = new Audio();
-
 let audioContext;
 let analyser;
 let source;
@@ -131,6 +132,23 @@ function spawnNote(){
 
     gameContainer.appendChild(note);
 
+    note.addEventListener("click", () => {
+
+    score++;
+
+    scoreText.textContent = score;
+    scoreText.style.transform = "scale(1.3) skew(-12deg)";
+
+setTimeout(() => {
+
+    scoreText.style.transform = "scale(1) skew(-12deg)";
+
+}, 100);
+
+    note.remove();
+
+});
+
     // Dirección aleatoria
     const angle = Math.random() * Math.PI * 2;
 
@@ -166,3 +184,77 @@ function spawnNote(){
     move();
 }
 
+
+const cursor = document.getElementById("cursor");
+
+const canvas = document.getElementById("trail-canvas");
+
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let mouseX = 0;
+let mouseY = 0;
+const trailPoints = [];
+
+let lastX = mouseX;
+let lastY = mouseY;
+
+document.addEventListener("mousemove", (e) => {
+
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    cursor.style.left = mouseX + "px";
+    cursor.style.top = mouseY + "px";
+
+    // Guardar punto
+    trailPoints.push({
+        x: mouseX,
+        y: mouseY,
+        life: 1
+    });
+
+});
+
+function animateTrail(){
+
+    // Limpiar canvas REALMENTE
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Dibujar trail
+    for(let i = 0; i < trailPoints.length - 1; i++){
+
+        const point = trailPoints[i];
+        const nextPoint = trailPoints[i + 1];
+
+        ctx.beginPath();
+
+        ctx.moveTo(point.x, point.y);
+        ctx.lineTo(nextPoint.x, nextPoint.y);
+
+        ctx.strokeStyle = `rgba(255,0,0,${point.life})`;
+
+        ctx.lineWidth = 12;
+
+        ctx.lineCap = "round";
+
+        ctx.stroke();
+
+        // Fade
+        point.life -= 0.03;
+    }
+
+    // Eliminar puntos muertos
+    for(let i = trailPoints.length - 1; i >= 0; i--){
+
+        if(trailPoints[i].life <= 0){
+
+            trailPoints.splice(i, 1);
+        }
+    }
+
+    requestAnimationFrame(animateTrail);
+}
+animateTrail();
