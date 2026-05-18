@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Juego Ritmo</title>
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="container">
+
+    <p id="song-name">
+      Ninguna canción seleccionada
+    </p>
+
+    <p id="song-time">
+    0:00 / 0:00
+    </p>
+
+    <p id="score">
+     PUNTOS: <span>0</span>
+    </p>
+    
+    <div id="game-container"></div>
+    <label for="music-input" id="music-button">
+  Seleccionar canción
+</label>
+
+<input type="file" id="music-input" accept="audio/mp3">
+    
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
