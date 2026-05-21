@@ -5,6 +5,7 @@ const gameContainer = document.getElementById("game-container");
 const scoreText = document.querySelector("#score span");
 
 let score = 0;
+let beatIntensity = 0;
 let audio = new Audio();
 let audioContext;
 let analyser;
@@ -93,15 +94,20 @@ function detectBeats(){
         }
 
         const average = sum / bufferLength;
+        beatIntensity = Math.min(1, Math.max(0, (average - 50) / 100));
+
+        const threshold = 70 + beatIntensity * 40;
+        const cooldown = 500 - beatIntensity * 300;
 
         const now = Date.now();
 
-        // Si hay pico de volumen
-        if(average > 90 && now - lastSpawn > 250){
+        if(average > threshold && now - lastSpawn > cooldown){
 
             lastSpawn = now;
-
-            spawnNote();
+            const notesToSpawn = 1 + Math.floor(beatIntensity * 2);
+            for (let i = 0; i < notesToSpawn; i++) {
+                spawnNote(beatIntensity);
+            }
         }
 
         requestAnimationFrame(update);
@@ -112,7 +118,7 @@ function detectBeats(){
 
 
 // Crear nota
-function spawnNote(){
+function spawnNote(intensity = 0){
 
     const note = document.createElement("div");
 
@@ -132,30 +138,12 @@ function spawnNote(){
 
     gameContainer.appendChild(note);
 
-    note.addEventListener("click", () => {
-
-    score++;
-
-    scoreText.textContent = score;
-    scoreText.style.transform = "scale(1.3) skew(-12deg)";
-
-setTimeout(() => {
-
-    scoreText.style.transform = "scale(1) skew(-12deg)";
-
-}, 100);
-
-    note.remove();
-
-});
-
     // Dirección aleatoria
     const angle = Math.random() * Math.PI * 2;
 
-    // Velocidad
-    const speed = 4;
+    // Velocidad según intensidad del ritmo
+    const speed = 2 + intensity * 8;
 
-    // Movimiento
     const velocityX = Math.cos(angle) * speed;
     const velocityY = Math.sin(angle) * speed;
 
@@ -167,7 +155,40 @@ setTimeout(() => {
         note.style.left = x + "px";
         note.style.top = y + "px";
 
-        // Eliminar si sale del mapa
+        // DETECCIÓN DE COLISIÓN
+        const noteRect = note.getBoundingClientRect();
+
+        const cursorRect = cursor.getBoundingClientRect();
+
+        const collision = !(
+
+            cursorRect.right < noteRect.left ||
+            cursorRect.left > noteRect.right ||
+            cursorRect.bottom < noteRect.top ||
+            cursorRect.top > noteRect.bottom
+
+        );
+
+        if(collision){
+
+            score++;
+
+            scoreText.textContent = score;
+
+            scoreText.style.transform = "scale(1.3) skew(-12deg)";
+
+            setTimeout(() => {
+
+                scoreText.style.transform = "scale(1) skew(-12deg)";
+
+            }, 100);
+
+            note.remove();
+
+            return;
+        }
+
+        // Eliminar si sale
         if(
             x < -100 ||
             x > 550 ||
@@ -184,38 +205,34 @@ setTimeout(() => {
     move();
 }
 
-
 const cursor = document.getElementById("cursor");
-
 const canvas = document.getElementById("trail-canvas");
-
 const ctx = canvas.getContext("2d");
+let trailPoints = [];
+let mouseX = 0;
+let mouseY = 0;
 
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let mouseX = 0;
-let mouseY = 0;
-const trailPoints = [];
-
-let lastX = mouseX;
-let lastY = mouseY;
+window.addEventListener("resize", () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
 
 document.addEventListener("mousemove", (e) => {
-
     mouseX = e.clientX;
     mouseY = e.clientY;
 
-    cursor.style.left = mouseX + "px";
-    cursor.style.top = mouseY + "px";
+    if (cursor) {
+        cursor.style.left = mouseX + "px";
+        cursor.style.top = mouseY + "px";
+    }
 
-    // Guardar punto
-    trailPoints.push({
-        x: mouseX,
-        y: mouseY,
-        life: 1
-    });
-
+    trailPoints.push({ x: mouseX, y: mouseY, life: 1 });
+    if (trailPoints.length > 40) {
+        trailPoints.shift();
+    }
 });
 
 function animateTrail(){
