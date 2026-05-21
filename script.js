@@ -216,20 +216,49 @@ window.addEventListener("resize", () => {
     canvas.height = window.innerHeight;
 });
 
-document.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
+function updateCursor(x, y){
 
-    if (cursor) {
+    mouseX = x;
+    mouseY = y;
+
+    if(cursor){
+
         cursor.style.left = mouseX + "px";
         cursor.style.top = mouseY + "px";
     }
 
-    trailPoints.push({ x: mouseX, y: mouseY, life: 1 });
-    if (trailPoints.length > 40) {
+    trailPoints.push({
+        x: mouseX,
+        y: mouseY,
+        life: 1
+    });
+
+    if(trailPoints.length > 40){
+
         trailPoints.shift();
     }
+}
+
+
+// PC
+document.addEventListener("mousemove", (e) => {
+
+    updateCursor(e.clientX, e.clientY);
+
 });
+
+
+// MOBILE
+document.addEventListener("touchmove", (e) => {
+
+    const touch = e.touches[0];
+
+    updateCursor(
+        touch.clientX,
+        touch.clientY
+    );
+
+}, { passive: true });
 
 function animateTrail(){
 

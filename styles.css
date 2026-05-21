@@ -15,6 +15,9 @@ body{
 
   font-family: Arial, Helvetica, sans-serif;
   padding-left: 50px;
+
+  overflow: hidden;
+  touch-action: none;
 }
 
 #music-input{
@@ -54,8 +57,9 @@ body{
 
 /* CONTENEDOR DEL JUEGO */
 #game-container{
-  width: 400px;
-  height: 400px;
+    width: min(85vw, 400px);
+
+  aspect-ratio: 1/1;
 
   background-color: transparent;
 
@@ -270,3 +274,45 @@ body{
 
 }
 
+@media (max-width: 768px){
+
+    body{
+        padding-left: 0;
+        justify-content: center;
+    }
+
+    #layout{
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    #song-panel{
+        width: 90%;
+        align-items: center;
+    }
+
+    #container{
+        width: 100%;
+    }
+
+    #score{
+
+        position: static;
+
+        transform: none;
+
+        flex-direction: row;
+
+        gap: 10px;
+
+        font-size: 25px;
+    }
+
+    #score span{
+        font-size: 40px;
+    }
+
+    #progress-container{
+        width: 85vw;
+    }
+}
