@@ -9,6 +9,28 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div id="layout">
+
+    <!-- PANEL IZQUIERDO -->
+    <div id="song-panel">
+
+        <h2>Temas</h2>
+
+        <button class="preset-song"
+            data-song="SONGS/Rock That Body.mp3">
+            Rock That Body
+        </button>
+
+        <button class="preset-song"
+            data-song="SONGS/Veridis Quo [POSwzCFwUZ0] (1).mp3">
+            Veridis Quo
+        </button>
+
+        <input type="file" id="music-input" accept="audio/mp3">
+
+    </div>
+
+
 <div id="container">
 
     <p id="song-name">
@@ -22,14 +44,13 @@
     <p id="score">
      POINTS: <span>0</span>
     </p>
+    
 
     <div id="game-container"></div>
-    <label for="music-input" id="music-button">
-  Seleccionar canción
-</label>
-
-<input type="file" id="music-input" accept="audio/mp3">
     
+     <label for="music-input" id="music-button">
+            Subir canción
+        </label>
 
 </div>
 

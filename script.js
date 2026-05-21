@@ -3,6 +3,9 @@ const songName = document.getElementById("song-name");
 const songTime = document.getElementById("song-time");
 const gameContainer = document.getElementById("game-container");
 const scoreText = document.querySelector("#score span");
+const presetSongs = document.querySelectorAll(".preset-song");
+const songPanel = document.getElementById("song-panel");
+const progressBar = document.getElementById("progress-bar");
 
 let score = 0;
 let beatIntensity = 0;
@@ -17,33 +20,23 @@ musicInput.addEventListener("change", async (event) => {
 
     if(file){
 
-        // Nombre canción
-        songName.textContent = file.name;
-
-        // URL local
         const musicURL = URL.createObjectURL(file);
 
-        audio.src = musicURL;
-
-        // Crear AudioContext
-        audioContext = new AudioContext();
-
-        analyser = audioContext.createAnalyser();
-
-        source = audioContext.createMediaElementSource(audio);
-
-        source.connect(analyser);
-
-        analyser.connect(audioContext.destination);
-
-        analyser.fftSize = 256;
-
-        // Reproducir
-        await audio.play();
-
-        // Empezar análisis
-        detectBeats();
+        startSong(musicURL, file.name);
     }
+});
+
+presetSongs.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+        const songSrc = button.dataset.song;
+
+        const songTitle = button.textContent;
+
+        startSong(songSrc, songTitle);
+
+    });
 
 });
 
@@ -56,6 +49,9 @@ audio.addEventListener("timeupdate", () => {
     const duration = formatTime(audio.duration);
 
     songTime.textContent = `${current} / ${duration}`;
+    const progress = (audio.currentTime / audio.duration) * 100;
+
+    progressBar.style.width = progress + "%";
 });
 
 
@@ -275,3 +271,32 @@ function animateTrail(){
     requestAnimationFrame(animateTrail);
 }
 animateTrail();
+
+
+// Canciones predefinidas
+async function startSong(songSrc, songTitle){
+
+    songName.textContent = songTitle;
+
+    audio.src = songSrc;
+
+    audioContext = new AudioContext();
+
+    analyser = audioContext.createAnalyser();
+
+    source = audioContext.createMediaElementSource(audio);
+
+    source.connect(analyser);
+
+    analyser.connect(audioContext.destination);
+
+    analyser.fftSize = 256;
+
+    await audio.play();
+
+    detectBeats();
+
+    songPanel.style.opacity = "0";
+
+    songPanel.style.pointerEvents = "none";
+}
